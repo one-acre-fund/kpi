@@ -6,9 +6,10 @@ import MultiCheckbox from 'js/components/common/multiCheckbox';
 import Checkbox from 'js/components/common/checkbox';
 import TextBox from 'js/components/common/textBox';
 import ToggleSwitch from 'js/components/common/toggleSwitch';
+import CopyToClipboard from 'react-copy-to-clipboard';
 import bem from 'js/bem';
 import {actions} from 'js/actions';
-import {formatTimeDate} from 'js/utils';
+import {formatTimeDate, notify} from 'js/utils';
 import mixins from 'js/mixins';
 import {
   ADDITIONAL_SUBMISSION_PROPS,
@@ -237,6 +238,14 @@ export default class ProjectExportsCreator extends React.Component {
       },
       ...this.state.definedExports,
     ];
+  }
+
+  getExportsUrl() {
+      if (this.state.selectedDefinedExport !== null) {
+          return this.state.selectedDefinedExport['data']['exports_url']
+      } else {
+          return ''
+      }
   }
 
   /**
@@ -729,14 +738,28 @@ export default class ProjectExportsCreator extends React.Component {
                 }
               </bem.ProjectDownloads__exportsSelector>
 
-              <bem.KoboButton
-                m='blue'
-                type='submit'
-                onClick={this.onSubmit}
-                disabled={this.state.selectedRows.size === 0}
-              >
-                {t('Export')}
-              </bem.KoboButton>
+              <div>
+                <bem.KoboButton
+                  m='blue'
+                  type='submit'
+                  onClick={this.onSubmit}
+                  disabled={this.state.selectedRows.size === 0}
+                >
+                  {t('Export')}
+                </bem.KoboButton>
+                <CopyToClipboard
+                  text={this.getExportsUrl()}
+                  onCopy={() => notify(t('Copied URL to clipboard'))}
+                  options={{format: 'text/plain'}}
+                >
+                  <button
+                    className='copy mdl-button mdl-button--colored'
+                    disabled={this.state.selectedDefinedExport === null}
+                  >
+                    {t('Copy URL')}
+                  </button>
+                </CopyToClipboard>
+              </div>
             </bem.ProjectDownloads__submitRow>
           </bem.FormView__form>
       </bem.FormView__cell>
